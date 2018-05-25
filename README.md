@@ -35,3 +35,35 @@ rsconf = {
 }
 rs.initiate(rsconf)
 ```
+
+You can view the status of replica set using ```rs.status()```
+
+### rs Helper Functions
+The following are identical
+```
+rs.initiate(config);
+rs.adminCommand({"replSetInitiate":config})
+```
+
+```
+db.isMaster()
+```
+
+
+read secondary replica data will return error.
+```
+> secondaryConn = new Mongo("localhost:21709")
+secondaryConn.getDB("test")
+secondary.coll.find()
+```
+To allow queries on the secondary
+```
+secondaryConn.setSlaveOk()
+```
+Note that slaveOk is set on the connection,not the database  
+You cannot write to secondary replica, the secondary will only perform writes
+that writes that it gets through replication, not from clients.
+
+
+
+```
