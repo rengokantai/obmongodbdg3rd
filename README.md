@@ -63,7 +63,37 @@ secondaryConn.setSlaveOk()
 Note that slaveOk is set on the connection,not the database  
 You cannot write to secondary replica, the secondary will only perform writes
 that writes that it gets through replication, not from clients.
+```
 
 
+automatic failover. If the primary goes down, one of the secondaries will automatically be elected primary.
 
 ```
+db.adminCommand({"shutdown":1})
+```
+Few key concepts to remember:
+- Clients can send a primary all the same operations they could send a standalone server (reads, writes, commands, index builds, etc.).
+- Clients cannot write to secondaries.
+- Clients, by default, cannot read from secondaries. Use```setSlaveOk()```
+
+
+### Changing Your Replica Set Configuration
+```
+rs.add("localhost:4")
+rs.remove(..")
+```
+reconfig
+```
+var config = rs.config()
+config.members[0].host = "localhost:27000"
+rs.reconfig(config)
+```
+
+With a minority of the set available, all members will be seconndaries.
+So at least 3 members required.
+
+
+
+### Member Configuration Options
+#### Member Configuraion Options
+
