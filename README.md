@@ -63,10 +63,11 @@ secondaryConn.setSlaveOk()
 Note that slaveOk is set on the connection,not the database  
 You cannot write to secondary replica, the secondary will only perform writes
 that writes that it gets through replication, not from clients.
-```
 
 
-automatic failover. If the primary goes down, one of the secondaries will automatically be elected primary.
+
+###### automatic failover. 
+If the primary goes down, one of the secondaries will automatically be elected primary.
 
 ```
 db.adminCommand({"shutdown":1})
@@ -94,6 +95,33 @@ So at least 3 members required.
 
 
 
-### Member Configuration Options
-#### Member Configuraion Options
+### Member Configuration Options 
+The replica sets we have set up so far have been fairly uniform in that every member
+#### Priority
+Priority is how strongly this member wants to become primary.  
+priority 0 can never become primary (passive members)
+```
+rs.add({"host" : "server-4:27017", "priority" : 1.5})
+```
 
+
+
+#### Hidden
+Must set priority to 0 first.
+```
+config.members[2].hidden=1
+config.members[2].priority=0
+rs.reconfig(config)
+```
+#### Creating Election Arbiters
+If due to financial costs, we want to keep two copys of data,
+Arbiters hold no data and aren't used by clients. they just provide a majority for two-member sets
+__You can not reconfigure an arbiter to become a nonarbiter, or vice versa__
+
+#### Building Indexes
+note:
+- Sometimes a secondary does not need to have the same (or any) indexes that exist on the primary. If you are using a secondary only for backup data or offline batch jobs, you might want to specify "buildIndexes" : false in the member’s configuration. This option prevents the secondary from building any indexes.
+
+- This is a permanent setting: members that have "buildIndexes" : false specified can never be reconfigured to be “normal” index-building members again. If you want to change a non-index-building member to an index-building one, you must remove it from the set, delete all of its data, re-add it to the set, and allow it to resync from scratch.
+
+Again, this option requires the member’s priority to be 0.
