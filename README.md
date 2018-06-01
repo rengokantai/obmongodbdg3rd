@@ -125,3 +125,16 @@ note:
 - This is a permanent setting: members that have "buildIndexes" : false specified can never be reconfigured to be “normal” index-building members again. If you want to change a non-index-building member to an index-building one, you must remove it from the set, delete all of its data, re-add it to the set, and allow it to resync from scratch.
 
 Again, this option requires the member’s priority to be 0.
+
+
+## 9. Components of a Replica Set
+### Syncing
+Each secondary maintains its own oplog.
+
+
+### Heartbeats
+Members need to know about other members' states. 
+To keep an up-to-date view of the set, a member sends out a heartbeat to every other member
+of the set every two seconds. 
+If a primary can no longer reach a majority of the servers, it will demote itself and become a secondary.
+
